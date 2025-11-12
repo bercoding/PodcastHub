@@ -21,23 +21,24 @@ final class MiniPlayerView: UIView {
     }
 
     private func setupViews() {
-        backgroundColor = .systemGroupedBackground
+        backgroundColor = .secondarySystemGroupedBackground
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: -2)
-        layer.shadowRadius = 4
-        layer.shadowOpacity = 0.1
+        layer.shadowRadius = 8
+        layer.shadowOpacity = 0.15
+        layer.cornerRadius = 0
 
         // Artwork
         artworkImageView.translatesAutoresizingMaskIntoConstraints = false
         artworkImageView.contentMode = .scaleAspectFill
         artworkImageView.clipsToBounds = true
-        artworkImageView.layer.cornerRadius = 4
+        artworkImageView.layer.cornerRadius = 6
         artworkImageView.backgroundColor = .systemGray5
         addSubview(artworkImageView)
 
         // Title Label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 1
         titleLabel.text = "Chưa có bài hát nào"
@@ -46,7 +47,9 @@ final class MiniPlayerView: UIView {
         // Play/Pause Button
         playPauseButton.translatesAutoresizingMaskIntoConstraints = false
         playPauseButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-        playPauseButton.tintColor = .label
+        playPauseButton.tintColor = .systemBlue
+        playPauseButton.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.1)
+        playPauseButton.layer.cornerRadius = 20
         playPauseButton.addTarget(self, action: #selector(didTapPlayPause), for: .touchUpInside)
         addSubview(playPauseButton)
 
@@ -54,6 +57,8 @@ final class MiniPlayerView: UIView {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         closeButton.tintColor = .secondaryLabel
+        closeButton.backgroundColor = UIColor.secondaryLabel.withAlphaComponent(0.1)
+        closeButton.layer.cornerRadius = 16
         closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
         addSubview(closeButton)
 
@@ -63,10 +68,10 @@ final class MiniPlayerView: UIView {
 
         NSLayoutConstraint.activate([
             // Artwork
-            artworkImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            artworkImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             artworkImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            artworkImageView.widthAnchor.constraint(equalToConstant: 48),
-            artworkImageView.heightAnchor.constraint(equalToConstant: 48),
+            artworkImageView.widthAnchor.constraint(equalToConstant: 52),
+            artworkImageView.heightAnchor.constraint(equalToConstant: 52),
 
             // Title
             titleLabel.leadingAnchor.constraint(equalTo: artworkImageView.trailingAnchor, constant: 12),
@@ -77,16 +82,16 @@ final class MiniPlayerView: UIView {
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
 
             // Play/Pause Button
-            playPauseButton.trailingAnchor.constraint(equalTo: closeButton.leadingAnchor, constant: -8),
+            playPauseButton.trailingAnchor.constraint(equalTo: closeButton.leadingAnchor, constant: -12),
             playPauseButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            playPauseButton.widthAnchor.constraint(equalToConstant: 44),
-            playPauseButton.heightAnchor.constraint(equalToConstant: 44),
+            playPauseButton.widthAnchor.constraint(equalToConstant: 40),
+            playPauseButton.heightAnchor.constraint(equalToConstant: 40),
 
             // Close Button
-            closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             closeButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            closeButton.widthAnchor.constraint(equalToConstant: 44),
-            closeButton.heightAnchor.constraint(equalToConstant: 44)
+            closeButton.widthAnchor.constraint(equalToConstant: 32),
+            closeButton.heightAnchor.constraint(equalToConstant: 32)
         ])
     }
 

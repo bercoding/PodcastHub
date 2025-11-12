@@ -6,6 +6,7 @@ final class PlayerViewController: UIViewController {
     private let artworkURL: URL?
     private let audioURL: URL
 
+    private let backdropOverlayView = UIView()
     private let artworkImageView = UIImageView()
     private let gradientLayer = CAGradientLayer()
     private let titleLabel = UILabel()
@@ -18,6 +19,7 @@ final class PlayerViewController: UIViewController {
     private let slider = UISlider()
     private let upNextLabel = UILabel()
     private let controlsContainer = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+    private let controlsStack = UIStackView()
     private let routePicker = AVRoutePickerView()
     private let closeButton = UIButton(type: .system)
 
@@ -71,6 +73,7 @@ final class PlayerViewController: UIViewController {
     }
 
     private func setupViews() {
+        configureBackdrop()
         configureArtwork()
         configureLabels()
         configureControlButtons()
@@ -80,12 +83,31 @@ final class PlayerViewController: UIViewController {
         applyConstraints()
     }
 
+    private func configureBackdrop() {
+        backdropOverlayView.translatesAutoresizingMaskIntoConstraints = false
+        backdropOverlayView.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor.black.withAlphaComponent(0.35)
+                : UIColor.white.withAlphaComponent(0.28)
+        }
+        backdropOverlayView.layer.cornerRadius = 24
+        backdropOverlayView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        backdropOverlayView.layer.masksToBounds = true
+        backdropOverlayView.alpha = 0.0
+    }
+
     private func configureArtwork() {
         artworkImageView.translatesAutoresizingMaskIntoConstraints = false
-        artworkImageView.layer.cornerRadius = 12
-        artworkImageView.layer.masksToBounds = true
         artworkImageView.contentMode = .scaleAspectFill
         artworkImageView.backgroundColor = .secondarySystemBackground
+        artworkImageView.clipsToBounds = true
+        artworkImageView.layer.cornerRadius = 16
+        // Thêm shadow container để shadow hoạt động với corner radius
+        artworkImageView.layer.shadowColor = UIColor.black.cgColor
+        artworkImageView.layer.shadowOffset = CGSize(width: 0, height: 8)
+        artworkImageView.layer.shadowRadius = 20
+        artworkImageView.layer.shadowOpacity = 0.4
+        artworkImageView.layer.masksToBounds = false
         gradientLayer.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.35).cgColor]
         gradientLayer.locations = [0.6, 1.0]
         artworkImageView.layer.addSublayer(gradientLayer)
@@ -93,12 +115,16 @@ final class PlayerViewController: UIViewController {
 
     private func configureLabels() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = .preferredFont(forTextStyle: .headline)
+        titleLabel.font = .systemFont(ofSize: 20, weight: .bold)
         titleLabel.numberOfLines = 2
         titleLabel.textAlignment = .center
         titleLabel.textColor = .label
-        // Đảm bảo label có background trong suốt để hiển thị
         titleLabel.backgroundColor = .clear
+        // Thêm shadow để text nổi bật hơn
+        titleLabel.layer.shadowColor = UIColor.black.cgColor
+        titleLabel.layer.shadowOffset = CGSize(width: 0, height: 1)
+        titleLabel.layer.shadowRadius = 3
+        titleLabel.layer.shadowOpacity = 0.3
     }
 
     private func configureControlButtons() {
@@ -108,22 +134,46 @@ final class PlayerViewController: UIViewController {
         playPauseButton.addTarget(self, action: #selector(didTapPlayPause), for: .touchUpInside)
         playPauseButton.contentHorizontalAlignment = .fill
         playPauseButton.contentVerticalAlignment = .fill
+        // Thêm shadow cho play button
+        playPauseButton.layer.shadowColor = UIColor.systemBlue.cgColor
+        playPauseButton.layer.shadowOffset = CGSize(width: 0, height: 2)
+        playPauseButton.layer.shadowRadius = 8
+        playPauseButton.layer.shadowOpacity = 0.4
 
         back15Button.translatesAutoresizingMaskIntoConstraints = false
         back15Button.setImage(UIImage(systemName: "gobackward.15"), for: .normal)
+        back15Button.tintColor = .label
+        back15Button.backgroundColor = UIColor.label.withAlphaComponent(0.1)
+        back15Button.layer.cornerRadius = 22
         back15Button.addTarget(self, action: #selector(didTapBack15), for: .touchUpInside)
 
         forward15Button.translatesAutoresizingMaskIntoConstraints = false
         forward15Button.setImage(UIImage(systemName: "goforward.15"), for: .normal)
+        forward15Button.tintColor = .label
+        forward15Button.backgroundColor = UIColor.label.withAlphaComponent(0.1)
+        forward15Button.layer.cornerRadius = 22
         forward15Button.addTarget(self, action: #selector(didTapForward15), for: .touchUpInside)
 
         speedButton.translatesAutoresizingMaskIntoConstraints = false
         speedButton.setTitle("1x", for: .normal)
+        speedButton.setTitleColor(.label, for: .normal)
+        speedButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        speedButton.tintColor = .label
+        speedButton.backgroundColor = UIColor.label.withAlphaComponent(0.1)
+        speedButton.layer.cornerRadius = 18
+        speedButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         speedButton.addTarget(self, action: #selector(didTapSpeed), for: .touchUpInside)
 
         controlsContainer.translatesAutoresizingMaskIntoConstraints = false
-        controlsContainer.layer.cornerRadius = 16
+        controlsContainer.layer.cornerRadius = 20
         controlsContainer.clipsToBounds = true
+        // Thêm shadow cho container
+        controlsContainer.layer.shadowColor = UIColor.black.cgColor
+        controlsContainer.layer.shadowOffset = CGSize(width: 0, height: 4)
+        controlsContainer.layer.shadowRadius = 12
+        controlsContainer.layer.shadowOpacity = 0.2
+        controlsContainer.layer.masksToBounds = false
+
         routePicker.translatesAutoresizingMaskIntoConstraints = false
         routePicker.tintColor = .label
 
@@ -131,24 +181,47 @@ final class PlayerViewController: UIViewController {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.setImage(UIImage(systemName: "chevron.down"), for: .normal)
         closeButton.tintColor = .label
+        closeButton.backgroundColor = UIColor.label.withAlphaComponent(0.2)
+        closeButton.layer.cornerRadius = 20
+        // Thêm shadow để nổi bật hơn
+        closeButton.layer.shadowColor = UIColor.black.cgColor
+        closeButton.layer.shadowOffset = CGSize(width: 0, height: 2)
+        closeButton.layer.shadowRadius = 4
+        closeButton.layer.shadowOpacity = 0.3
         closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+
+        // Controls stack setup
+        controlsStack.axis = .horizontal
+        controlsStack.alignment = .center
+        controlsStack.distribution = .equalCentering
+        controlsStack.spacing = 24
+        controlsStack.translatesAutoresizingMaskIntoConstraints = false
+        controlsStack.addArrangedSubview(routePicker)
+        controlsStack.addArrangedSubview(back15Button)
+        controlsStack.addArrangedSubview(playPauseButton)
+        controlsStack.addArrangedSubview(forward15Button)
+        controlsStack.addArrangedSubview(speedButton)
     }
 
     private func configureSlider() {
         currentTimeLabel.translatesAutoresizingMaskIntoConstraints = false
-        currentTimeLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
+        currentTimeLabel.font = .monospacedDigitSystemFont(ofSize: 14, weight: .medium)
         currentTimeLabel.text = "0:00"
         currentTimeLabel.textColor = .label
         currentTimeLabel.backgroundColor = .clear
 
         durationLabel.translatesAutoresizingMaskIntoConstraints = false
-        durationLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
+        durationLabel.font = .monospacedDigitSystemFont(ofSize: 14, weight: .medium)
         durationLabel.textAlignment = .right
         durationLabel.text = "0:00"
         durationLabel.textColor = .label
         durationLabel.backgroundColor = .clear
 
         slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.minimumTrackTintColor = .systemBlue
+        slider.maximumTrackTintColor = UIColor.label.withAlphaComponent(0.2)
+        slider.thumbTintColor = .white
+        // Thêm shadow cho thumb
         slider.addTarget(self, action: #selector(didSlide(_:)), for: .valueChanged)
     }
 
@@ -160,67 +233,95 @@ final class PlayerViewController: UIViewController {
     }
 
     private func addSubviews() {
-        view.addSubview(closeButton)
+        // Backdrop overlay ở dưới cùng
+        view.addSubview(backdropOverlayView)
+
+        // Các controls và content ở trên
         view.addSubview(artworkImageView)
         view.addSubview(titleLabel)
         view.addSubview(controlsContainer)
-        controlsContainer.contentView.addSubview(playPauseButton)
-        controlsContainer.contentView.addSubview(back15Button)
-        controlsContainer.contentView.addSubview(forward15Button)
-        controlsContainer.contentView.addSubview(speedButton)
-        controlsContainer.contentView.addSubview(routePicker)
+        controlsContainer.contentView.addSubview(controlsStack)
         view.addSubview(currentTimeLabel)
         view.addSubview(durationLabel)
         view.addSubview(slider)
         view.addSubview(upNextLabel)
+
+        // Close button và controls ở trên cùng để luôn hiển thị
+        view.addSubview(closeButton)
+
+        // Đảm bảo tất cả controls nằm trên backdrop
+        view.bringSubviewToFront(closeButton)
+        view.bringSubviewToFront(controlsContainer)
+        view.bringSubviewToFront(titleLabel)
+        view.bringSubviewToFront(currentTimeLabel)
+        view.bringSubviewToFront(durationLabel)
+        view.bringSubviewToFront(slider)
+        view.bringSubviewToFront(upNextLabel)
     }
 
     private func applyConstraints() {
         NSLayoutConstraint.activate([
-            // Close Button
-            closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            closeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            closeButton.widthAnchor.constraint(equalToConstant: 44),
-            closeButton.heightAnchor.constraint(equalToConstant: 44),
+            backdropOverlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            backdropOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backdropOverlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backdropOverlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            artworkImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
+            // Close Button - đặt trên artwork với khoảng cách hợp lý
+            closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            closeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            closeButton.widthAnchor.constraint(equalToConstant: 40),
+            closeButton.heightAnchor.constraint(equalToConstant: 40),
+
+            artworkImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
             artworkImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            artworkImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.82),
+            artworkImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.75),
             artworkImageView.heightAnchor.constraint(equalTo: artworkImageView.widthAnchor),
 
-            titleLabel.topAnchor.constraint(equalTo: artworkImageView.bottomAnchor, constant: 16),
+            titleLabel.topAnchor.constraint(equalTo: artworkImageView.bottomAnchor, constant: 24),
             titleLabel.leadingAnchor.constraint(equalTo: artworkImageView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: artworkImageView.trailingAnchor),
 
-            controlsContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
+            controlsContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
             controlsContainer.leadingAnchor.constraint(equalTo: artworkImageView.leadingAnchor),
             controlsContainer.trailingAnchor.constraint(equalTo: artworkImageView.trailingAnchor),
             controlsContainer.heightAnchor.constraint(equalToConstant: 88),
 
-            playPauseButton.centerXAnchor.constraint(equalTo: controlsContainer.centerXAnchor),
-            playPauseButton.centerYAnchor.constraint(equalTo: controlsContainer.centerYAnchor),
-            playPauseButton.widthAnchor.constraint(equalToConstant: 64),
+            controlsStack.leadingAnchor.constraint(
+                equalTo: controlsContainer.contentView.leadingAnchor,
+                constant: 24
+            ),
+            controlsStack.trailingAnchor.constraint(
+                equalTo: controlsContainer.contentView.trailingAnchor,
+                constant: -24
+            ),
+            controlsStack.topAnchor.constraint(
+                equalTo: controlsContainer.contentView.topAnchor,
+                constant: 12
+            ),
+            controlsStack.bottomAnchor.constraint(
+                equalTo: controlsContainer.contentView.bottomAnchor,
+                constant: -12
+            ),
+
+            playPauseButton.widthAnchor.constraint(equalToConstant: 72),
             playPauseButton.heightAnchor.constraint(equalTo: playPauseButton.widthAnchor),
 
-            back15Button.centerYAnchor.constraint(equalTo: playPauseButton.centerYAnchor),
-            back15Button.trailingAnchor.constraint(equalTo: playPauseButton.leadingAnchor, constant: -28),
+            back15Button.widthAnchor.constraint(equalToConstant: 44),
+            back15Button.heightAnchor.constraint(equalToConstant: 44),
 
-            forward15Button.centerYAnchor.constraint(equalTo: playPauseButton.centerYAnchor),
-            forward15Button.leadingAnchor.constraint(equalTo: playPauseButton.trailingAnchor, constant: 28),
+            forward15Button.widthAnchor.constraint(equalToConstant: 44),
+            forward15Button.heightAnchor.constraint(equalToConstant: 44),
 
-            speedButton.centerYAnchor.constraint(equalTo: playPauseButton.centerYAnchor),
-            speedButton.trailingAnchor.constraint(equalTo: controlsContainer.trailingAnchor, constant: -12),
+            speedButton.heightAnchor.constraint(equalToConstant: 36),
 
-            routePicker.centerYAnchor.constraint(equalTo: playPauseButton.centerYAnchor),
-            routePicker.leadingAnchor.constraint(equalTo: controlsContainer.leadingAnchor, constant: 12),
-            routePicker.widthAnchor.constraint(equalToConstant: 32),
-            routePicker.heightAnchor.constraint(equalToConstant: 32),
+            routePicker.widthAnchor.constraint(equalToConstant: 36),
+            routePicker.heightAnchor.constraint(equalToConstant: 36),
 
-            slider.topAnchor.constraint(equalTo: controlsContainer.bottomAnchor, constant: 16),
+            slider.topAnchor.constraint(equalTo: controlsContainer.bottomAnchor, constant: 24),
             slider.leadingAnchor.constraint(equalTo: artworkImageView.leadingAnchor),
             slider.trailingAnchor.constraint(equalTo: artworkImageView.trailingAnchor),
 
-            currentTimeLabel.topAnchor.constraint(equalTo: slider.bottomAnchor, constant: 8),
+            currentTimeLabel.topAnchor.constraint(equalTo: slider.bottomAnchor, constant: 12),
             currentTimeLabel.leadingAnchor.constraint(equalTo: slider.leadingAnchor),
             currentTimeLabel.widthAnchor.constraint(equalToConstant: 60),
 
@@ -253,9 +354,15 @@ final class PlayerViewController: UIViewController {
         if let url = artworkURL {
             loadImage(url: url)
         } else {
+            let fallback = UIColor.systemBlue
             artworkImageView.image = UIImage(systemName: "waveform.circle.fill")
-            artworkImageView.tintColor = .systemBlue
-            view.backgroundColor = .systemGroupedBackground
+            artworkImageView.tintColor = fallback
+            let adjusted = adjustedBackgroundColor(from: fallback)
+            gradientLayer.colors = [
+                UIColor.clear.cgColor,
+                adjusted.withAlphaComponent(0.7).cgColor
+            ]
+            view.backgroundColor = adjusted
         }
     }
 
@@ -270,20 +377,12 @@ final class PlayerViewController: UIViewController {
 
             if let error {
                 print("⚠️ Lỗi load image: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.artworkImageView.image = UIImage(systemName: "waveform.circle.fill")
-                    self.artworkImageView.tintColor = .systemBlue
-                    self.view.backgroundColor = .systemGroupedBackground
-                }
+                applyFallbackAppearance()
                 return
             }
 
             guard let data, let image = UIImage(data: data) else {
-                DispatchQueue.main.async {
-                    self.artworkImageView.image = UIImage(systemName: "waveform.circle.fill")
-                    self.artworkImageView.tintColor = .systemBlue
-                    self.view.backgroundColor = .systemGroupedBackground
-                }
+                applyFallbackAppearance()
                 return
             }
 
@@ -294,18 +393,66 @@ final class PlayerViewController: UIViewController {
                     options: .transitionCrossDissolve
                 ) {
                     self.artworkImageView.image = image
-                    let color = image.averageColor
+                    let averageColor = image.averageColor
+                    let background = self.adjustedBackgroundColor(from: averageColor)
+                    self.animateBackdrop(into: background)
                     self.gradientLayer.colors = [
                         UIColor.clear.cgColor,
-                        color.withAlphaComponent(0.55).cgColor
+                        background.withAlphaComponent(0.7).cgColor
                     ]
-                    // Đảm bảo background không quá tối
-                    let bgColor = color.withAlphaComponent(0.12)
-                    self.view.backgroundColor = bgColor
+                    self.view.backgroundColor = background
                 }
             }
         }
         task.resume()
+    }
+
+    private func applyFallbackAppearance() {
+        DispatchQueue.main.async {
+            let fallback = UIColor.systemBlue
+            self.artworkImageView.image = UIImage(systemName: "waveform.circle.fill")
+            self.artworkImageView.tintColor = fallback
+            let adjusted = self.adjustedBackgroundColor(from: fallback)
+            self.animateBackdrop(into: adjusted)
+            self.gradientLayer.colors = [
+                UIColor.clear.cgColor,
+                adjusted.withAlphaComponent(0.7).cgColor
+            ]
+            self.view.backgroundColor = adjusted
+        }
+    }
+
+    private func animateBackdrop(into color: UIColor) {
+        UIView.animate(withDuration: 0.3) {
+            self.backdropOverlayView.alpha = 1
+            self.backdropOverlayView.backgroundColor = color.withAlphaComponent(
+                self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.3
+            )
+        }
+    }
+
+    private func adjustedBackgroundColor(from color: UIColor) -> UIColor {
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var brightness: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        guard color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) else {
+            return UIColor { trait in
+                trait.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
+            }
+        }
+
+        let minBrightness: CGFloat = traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.45
+        let adjustedBrightness = max(brightness, minBrightness)
+        let adjustedSaturation = saturation * 0.65
+
+        return UIColor(
+            hue: hue,
+            saturation: adjustedSaturation,
+            brightness: adjustedBrightness,
+            alpha: 1
+        ).withAlphaComponent(0.9)
     }
 
     private func bindPlayer() {

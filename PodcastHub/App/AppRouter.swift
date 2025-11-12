@@ -18,7 +18,7 @@ final class AppRouter: AppRouting {
         let searchVC = dependencyContainer.makeSearchViewController(router: self)
         let libraryVC = LibraryViewController()
         let settingsVC = UIHostingController(rootView: SettingsView())
-        
+
         homeVC.tabBarItem = UITabBarItem(title: "Trang chủ", image: UIImage(systemName: "house.fill"), tag: 0)
         searchVC.tabBarItem = UITabBarItem(
             title: "Tìm kiếm",
@@ -35,7 +35,7 @@ final class AppRouter: AppRouting {
             image: UIImage(systemName: "gearshape.fill"),
             tag: 3
         )
-        
+
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
             UINavigationController(rootViewController: homeVC),
@@ -44,10 +44,10 @@ final class AppRouter: AppRouting {
             settingsVC
         ]
         self.tabBarController = tabBarController
-        
+
         // Attach Mini Player
         MiniPlayerManager.shared.attach(to: tabBarController)
-        
+
         window.rootViewController = tabBarController
     }
 

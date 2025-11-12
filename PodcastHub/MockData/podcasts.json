@@ -1,0 +1,111 @@
+{
+  "podcasts": [
+    {
+      "id": "swift-over-coffee",
+      "title": "Swift Over Coffee",
+      "publisher": "Paul Hudson & Sean Allen",
+      "description": "Podcast bàn luận về những cập nhật nóng nhất của cộng đồng Swift và iOS.",
+      "imageURL": "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      "thumbnailURL": "https://images.unsplash.com/photo-1525182008055-f88b95ff7980",
+      "rss": "https://swift-over-coffee/mock.rss",
+      "genres": [
+        "Technology",
+        "Developer"
+      ],
+      "episodes": [
+        {
+          "id": "swift-over-coffee-ep-01",
+          "title": "Nhập môn SwiftUI 5",
+          "audioURL": "https://example.com/audio/swift-over-coffee-ep01.mp3",
+          "thumbnailURL": "https://images.unsplash.com/photo-1556157382-97eda2d62296",
+          "description": "Thảo luận về những API mới của SwiftUI 5 và cách áp dụng vào app production.",
+          "duration": 1854,
+          "publishDate": "2024-08-18T09:00:00Z",
+          "explicit": false
+        },
+        {
+          "id": "swift-over-coffee-ep-02",
+          "title": "Design Pattern cho MVVM iOS",
+          "audioURL": "https://example.com/audio/swift-over-coffee-ep02.mp3",
+          "thumbnailURL": "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+          "description": "Đi sâu vào Repository pattern, dependency injection và cách unit test ViewModel.",
+          "duration": 2130,
+          "publishDate": "2024-09-02T09:00:00Z",
+          "explicit": false
+        }
+      ]
+    },
+    {
+      "id": "firebase-turbo",
+      "title": "Firebase Turbo",
+      "publisher": "Firebase Vietnam Community",
+      "description": "Kinh nghiệm triển khai Firebase Auth, Firestore, Remote Config cho sản phẩm thực tế.",
+      "imageURL": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2",
+      "thumbnailURL": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+      "rss": "https://firebase-turbo/mock.rss",
+      "genres": [
+        "Technology",
+        "Cloud"
+      ],
+      "episodes": [
+        {
+          "id": "firebase-turbo-ep-01",
+          "title": "Tối ưu Firestore cho ứng dụng mobile",
+          "audioURL": "https://example.com/audio/firebase-turbo-ep01.mp3",
+          "thumbnailURL": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d",
+          "description": "Cách thiết kế collection, security rules, listener realtime cho app iOS.",
+          "duration": 1986,
+          "publishDate": "2024-07-12T10:00:00Z",
+          "explicit": false
+        },
+        {
+          "id": "firebase-turbo-ep-02",
+          "title": "Push Notification với FCM và App Clips",
+          "audioURL": "https://example.com/audio/firebase-turbo-ep02.mp3",
+          "thumbnailURL": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6",
+          "description": "Cách kết hợp FCM với UserNotifications, phân loại topic và A/B Testing bằng Remote Config.",
+          "duration": 1765,
+          "publishDate": "2024-09-28T11:00:00Z",
+          "explicit": false
+        }
+      ]
+    },
+    {
+      "id": "design-sprint-vn",
+      "title": "Design Sprint Việt Nam",
+      "publisher": "Product Design VN",
+      "description": "Phỏng vấn các designer, PM và developer về quy trình thiết kế trải nghiệm người dùng.",
+      "imageURL": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
+      "thumbnailURL": "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+      "rss": "https://design-sprint-vn/mock.rss",
+      "genres": [
+        "Design",
+        "Product"
+      ],
+      "episodes": [
+        {
+          "id": "design-sprint-ep-01",
+          "title": "Tư duy hệ thống trong thiết kế UI",
+          "audioURL": "https://example.com/audio/design-sprint-ep01.mp3",
+          "thumbnailURL": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6",
+          "description": "Làm thế nào để phối hợp giữa design system và implementation SwiftUI/UIKit.",
+          "duration": 2052,
+          "publishDate": "2024-05-22T08:30:00Z",
+          "explicit": false
+        },
+        {
+          "id": "design-sprint-ep-02",
+          "title": "AutoLayout tips cho layout phức tạp",
+          "audioURL": "https://example.com/audio/design-sprint-ep02.mp3",
+          "thumbnailURL": "https://images.unsplash.com/photo-1556157382-97eda2d62296",
+          "description": "Chia sẻ của senior iOS developer về constraint tối ưu, dynamic type và accessibility.",
+          "duration": 1894,
+          "publishDate": "2024-10-05T08:30:00Z",
+          "explicit": false
+        }
+      ]
+    }
+  ]
+}
+
+

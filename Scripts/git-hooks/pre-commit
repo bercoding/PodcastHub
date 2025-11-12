@@ -1,0 +1,21 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+PROJECT_ROOT="/Users/lethanhnhan/Desktop/PROJECT_IOS/PodcastHub"
+
+echo "🔧 SwiftFormat"
+if command -v swiftformat >/dev/null 2>&1; then
+    swiftformat "$PROJECT_ROOT/PodcastHub"
+else
+    echo "⚠️  SwiftFormat không tìm thấy, bỏ qua." >&2
+fi
+
+echo "🔍 SwiftLint"
+if command -v swiftlint >/dev/null 2>&1; then
+    swiftlint --strict
+else
+    echo "⚠️  SwiftLint không tìm thấy, bỏ qua." >&2
+fi
+
+

@@ -1,0 +1,19 @@
+--swiftversion 5.9
+--allman false
+--elseposition same-line
+--ifdef no-indent
+--indent 4
+--linebreaks lf
+--maxwidth 110
+--self init-only
+--stripunusedargs closure-only
+--typeattributes prev-line
+--wraparguments before-first
+--wrapcollections before-first
+--wrapconditions before-first
+--extensionacl on-declarations
+--ranges spaced
+--trimwhitespace always
+--commas inline
+
+

@@ -173,6 +173,8 @@ final class ShowDetailHeaderView: UIView {
     private let topButtonStack = UIStackView()
     private var isFavorite = false
     private var isDescriptionExpanded = false
+    private var currentShow: Show?
+    private let libraryService = LibraryService.shared
     var onLayoutChange: (() -> Void)?
 
     override init(frame: CGRect) {
@@ -215,13 +217,17 @@ final class ShowDetailHeaderView: UIView {
     }
 
     func configure(with show: Show) {
+        currentShow = show
         titleLabel.text = show.title
         publisherLabel.text = show.publisher
         descriptionLabel.text = show.description.isEmpty ? "Không có mô tả" : show.description
         isDescriptionExpanded = false
         updateDescriptionExpansion()
-        isFavorite = false
+
+        // Load trạng thái hiện tại từ Core Data
+        isFavorite = libraryService.isShowFavorited(show.id)
         updateFavoriteButton()
+        updateButtonStates(show: show)
 
         configureMetaInfo(show: show)
         configureChips(with: show.genres)
@@ -232,6 +238,20 @@ final class ShowDetailHeaderView: UIView {
             applyPlaceholderArtwork()
             updateBackgroundGradient(using: .systemBlue)
         }
+    }
+
+    private func updateButtonStates(show: Show) {
+        let isSaved = libraryService.isShowSaved(show.id)
+        let isDownloaded = libraryService.isShowDownloaded(show.id)
+
+        // Cập nhật UI của các nút dựa trên trạng thái
+        saveButton.setTitle(isSaved ? "Đã lưu" : "Lưu", for: .normal)
+        saveButton.backgroundColor = isSaved ? UIColor.systemGreen.withAlphaComponent(0.12) : UIColor
+            .systemBlue.withAlphaComponent(0.12)
+        saveButton.setTitleColor(isSaved ? .systemGreen : .systemBlue, for: .normal)
+
+        downloadButton.setTitle(isDownloaded ? "Đã tải" : "Tải về", for: .normal)
+        downloadButton.backgroundColor = isDownloaded ? UIColor.systemGreen : .systemBlue
     }
 
     private func configureMetaInfo(show: Show) {
@@ -533,8 +553,21 @@ final class ShowDetailHeaderView: UIView {
     }
 
     @objc private func didTapFavorite() {
-        isFavorite.toggle()
-        updateFavoriteButton()
+        guard let show = currentShow else { return }
+
+        do {
+            if isFavorite {
+                try libraryService.unfavoriteShow(show.id)
+                isFavorite = false
+            } else {
+                try libraryService.favoriteShow(show)
+                isFavorite = true
+            }
+            updateFavoriteButton()
+            NotificationCenter.default.post(name: NSNotification.Name("LibraryUpdated"), object: nil)
+        } catch {
+            print("⚠️ Lỗi khi cập nhật yêu thích: \(error.localizedDescription)")
+        }
     }
 
     private func updateFavoriteButton() {
@@ -576,6 +609,7 @@ final class ShowDetailHeaderView: UIView {
         downloadButton.layer.shadowRadius = 8
         downloadButton.layer.shadowOpacity = 0.3
         downloadButton.layer.masksToBounds = false
+        downloadButton.addTarget(self, action: #selector(didTapDownload), for: .touchUpInside)
     }
 
     private func configureSaveButton() {
@@ -588,6 +622,41 @@ final class ShowDetailHeaderView: UIView {
         saveButton.layer.cornerRadius = 14
         saveButton.layer.cornerCurve = .continuous
         saveButton.layer.masksToBounds = true
+        saveButton.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
+    }
+
+    @objc private func didTapDownload() {
+        guard let show = currentShow else { return }
+
+        do {
+            let isDownloaded = libraryService.isShowDownloaded(show.id)
+            if isDownloaded {
+                try libraryService.removeDownloadedShow(show.id)
+            } else {
+                try libraryService.downloadShow(show)
+            }
+            updateButtonStates(show: show)
+            NotificationCenter.default.post(name: NSNotification.Name("LibraryUpdated"), object: nil)
+        } catch {
+            print("⚠️ Lỗi khi tải về: \(error.localizedDescription)")
+        }
+    }
+
+    @objc private func didTapSave() {
+        guard let show = currentShow else { return }
+
+        do {
+            let isSaved = libraryService.isShowSaved(show.id)
+            if isSaved {
+                try libraryService.removeSavedShow(show.id)
+            } else {
+                try libraryService.saveShow(show)
+            }
+            updateButtonStates(show: show)
+            NotificationCenter.default.post(name: NSNotification.Name("LibraryUpdated"), object: nil)
+        } catch {
+            print("⚠️ Lỗi khi lưu: \(error.localizedDescription)")
+        }
     }
 
     private func makeMetaBadge(icon: String, text: String) -> UIView {

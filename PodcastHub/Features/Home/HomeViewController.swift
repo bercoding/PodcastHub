@@ -37,9 +37,20 @@ final class HomeViewController: UIViewController {
 
     private func setupViews() {
         view.backgroundColor = .systemGroupedBackground
+
+        // Configure table view
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(HomeShowCell.self, forCellReuseIdentifier: HomeShowCell.reuseIdentifier)
         tableView.delegate = self
+        tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = true
+        tableView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 16, right: 0)
+
+        // Pull to refresh
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -47,12 +58,23 @@ final class HomeViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+
+        // Loading indicator
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.color = .systemBlue
+        loadingIndicator.hidesWhenStopped = true
         view.addSubview(loadingIndicator)
         NSLayoutConstraint.activate([
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+
+    @objc private func refreshData() {
+        viewModel.loadTrending()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.tableView.refreshControl?.endRefreshing()
+        }
     }
 
     private func bindViewModel() {
@@ -103,10 +125,36 @@ final class HomeViewController: UIViewController {
 
 extension HomeViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         guard let show = dataSource.itemIdentifier(for: indexPath) else {
             return
         }
-        viewModel.didSelectShow(show)
+
+        // Haptic feedback
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+
+        // Animate selection
+        if let cell = tableView.cellForRow(at: indexPath) {
+            UIView.animate(withDuration: 0.1, animations: {
+                cell.transform = CGAffineTransform(scaleX: 0.97, y: 0.97)
+            }) { _ in
+                UIView.animate(withDuration: 0.1) {
+                    cell.transform = .identity
+                }
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            tableView.deselectRow(at: indexPath, animated: true)
+            self.viewModel.didSelectShow(show)
+        }
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        UITableView.automaticDimension
+    }
+
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        120
     }
 }

@@ -29,18 +29,35 @@ final class LibraryViewController: UIViewController {
     private let headerView = LibraryHeaderView()
     private let authService = AuthService()
     private var authStateHandle: AuthStateDidChangeListenerHandle?
+    private let libraryService = LibraryService.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         setupHeader()
         setupAuthListener()
+        setupLibraryObserver()
         applyInitialSnapshot()
         updateUserState()
+        refreshCounts()
+    }
+
+    private func setupLibraryObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(libraryUpdated),
+            name: NSNotification.Name("LibraryUpdated"),
+            object: nil
+        )
+    }
+
+    @objc private func libraryUpdated() {
+        refreshCounts()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
         if let handle = authStateHandle {
             authService.removeStateDidChangeListener(handle)
         }
@@ -110,12 +127,17 @@ final class LibraryViewController: UIViewController {
     }
 
     private func getCount(for section: Section) -> Int {
-        // TODO: Lấy số lượng thực tế từ Realm/Firestore
         switch section {
-        case .saved: 0
-        case .favorites: 0
-        case .downloaded: 0
+        case .saved: libraryService.getSavedCount()
+        case .favorites: libraryService.getFavoritedCount()
+        case .downloaded: libraryService.getDownloadedCount()
         }
+    }
+
+    private func refreshCounts() {
+        var snapshot = dataSource.snapshot()
+        snapshot.reloadItems(Section.allCases)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 
     private func setupAuthListener() {
@@ -233,16 +255,21 @@ final class LibraryViewController: UIViewController {
 extension LibraryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let category = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let section = dataSource.itemIdentifier(for: indexPath) else { return }
 
-        // TODO: Navigate to detail screen for each category
-        let alert = UIAlertController(
-            title: category.title,
-            message: "Danh sách \(category.title.lowercased()) đang được cập nhật",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Đóng", style: .default))
-        present(alert, animated: true)
+        // Map Section to LibraryListViewController.LibraryCategory
+        let libraryCategory: LibraryListViewController.LibraryCategory = switch section {
+        case .saved:
+            .saved
+        case .favorites:
+            .favorites
+        case .downloaded:
+            .downloaded
+        }
+
+        // Navigate to LibraryListViewController
+        let listVC = LibraryListViewController(category: libraryCategory)
+        navigationController?.pushViewController(listVC, animated: true)
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
